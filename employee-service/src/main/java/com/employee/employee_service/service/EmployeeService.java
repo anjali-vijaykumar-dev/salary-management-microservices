@@ -34,8 +34,12 @@ public class EmployeeService {
         Employee existingEmployee = repository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
         existingEmployee.setName(employee.getName());
         existingEmployee.setDepartment(employee.getDepartment());
-        existingEmployee.setEmail(employee.getEmail());
         existingEmployee.setDesignation(employee.getDesignation());
+        if (!existingEmployee.getEmail().equals(employee.getEmail())
+                && repository.existsByEmail(employee.getEmail())) {
+            throw new DuplicateEmailException(employee.getEmail());
+        }
+        existingEmployee.setEmail(employee.getEmail());
 
         return repository.save(existingEmployee);
     }
