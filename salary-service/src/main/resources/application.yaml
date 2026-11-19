@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: salary-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/salary_db
+    username: postgres
+    password: Sangam@21543
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8082
