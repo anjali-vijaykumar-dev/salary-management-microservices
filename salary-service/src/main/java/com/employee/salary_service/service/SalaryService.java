@@ -1,14 +1,18 @@
 package com.employee.salary_service.service;
 
+import com.employee.salary_service.client.EmployeeClient;
 import com.employee.salary_service.dto.CreateSalaryRequest;
 import com.employee.salary_service.dto.SalaryRevisionRequest;
 import com.employee.salary_service.entity.Salary;
+import com.employee.salary_service.exception.EmployeeNotFoundException;
 import com.employee.salary_service.exception.InvalidSalaryRevisionException;
 import com.employee.salary_service.exception.SalaryAlreadyExistsException;
 import com.employee.salary_service.exception.SalaryNotFoundException;
 import com.employee.salary_service.repository.SalaryRepository;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.employee.salary_service.entity.RevisonType;
@@ -23,8 +27,11 @@ import java.util.List;
 public class SalaryService {
 
     private final SalaryRepository salaryRepo;
+    private final EmployeeClient employeeClient;
 
     public Salary createJoiningSalary(CreateSalaryRequest request) {
+        
+        validateEmpployeeExists(request.getEmployeeId());
         if (salaryRepo.existsByEmployeeId(request.getEmployeeId())) {
             throw new SalaryAlreadyExistsException(request.getEmployeeId());
         }
@@ -36,6 +43,14 @@ public class SalaryService {
         salary.setRevisionType(RevisonType.JOINING);
         return salaryRepo.save(salary);
 
+    }
+
+    private void validateEmpployeeExists(Long employeeId) {
+        try{
+            employeeClient.getEmployeeById(employeeId);
+        }catch (FeignException.NotFound ex){
+            throw  new EmployeeNotFoundException(employeeId);
+        }
     }
 
     @Transactional

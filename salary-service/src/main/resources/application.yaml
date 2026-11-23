@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/salary_db
     username: postgres
-    password: Sangam@21543
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -13,3 +13,6 @@ spring:
     show-sql: true
 server:
   port: 8082
+
+employee-service:
+  url: http://localhost:8081
